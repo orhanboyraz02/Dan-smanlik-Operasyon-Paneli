@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MARKOPAŞA — Danışmanlık & Çözüm Merkezi</title>
+<meta name="description" content="Doğru Uzman, Doğru Çözüm. ODAK Life 360 bünyesinde MarkoPaşa Danışmanlık & Çözüm Merkezi." />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0a1628;
+    --navy-2:#132347;
+    --navy-3:#1a2d4d;
+    --gold:#d4a843;
+    --gold-2:#e8c96a;
+    --gold-3:#b8922f;
+    --bg:#f5f7fb;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --green:#10b981;
+    --red:#ef4444;
+    --amber:#f59e0b;
+    --blue:#3b82f6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+  /* ============ LAYOUT ============ */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    width:260px;background:linear-gradient(180deg,var(--navy) 0%,#081120 100%);
+    color:#fff;position:fixed;top:0;left:0;bottom:0;z-index:50;
+    display:flex;flex-direction:column;transition:transform .3s ease;
+    box-shadow:4px 0 24px rgba(0,0,0,.15);overflow-y:auto
+  }
+  .sidebar::-webkit-scrollbar{width:6px}
+  .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+  .brand{padding:20px 18px;display:flex;gap:12px;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
+  .brand-logo{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--gold),var(--gold-3));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;color:var(--navy);font-size:16px;letter-spacing:-.5px
+  }
+  .brand h1{font-size:15px;font-weight:800;line-height:1.15;letter-spacing:-.3px}
+  .brand small{color:var(--gold);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+  .nav-group{padding:14px 14px 4px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);font-weight:700}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 16px;color:rgba(255,255,255,.7);
+    font-size:13px;font-weight:500;border-left:3px solid transparent;transition:.2s;width:100%;text-align:left
+  }
+  .nav-item:hover{background:rgba(255,255,255,.05);color:#fff;border-left-color:var(--gold)}
+  .nav-item.active{background:rgba(212,168,67,.12);color:var(--gold-2);border-left-color:var(--gold)}
+  .nav-item i{width:20px;text-align:center;font-style:normal;font-size:15px}
+  .side-user{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--navy-3),var(--navy));display:flex;align-items:center;justify-content:center;color:var(--gold-2);font-weight:700;font-size:12px;border:2px solid var(--gold)}
+
+  /* ============ MAIN ============ */
+  .main{flex:1;margin-left:260px;padding:22px 28px 0;display:flex;flex-direction:column;min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+  .topbar h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px}
+  .crumb{font-size:12px;color:var(--muted);margin-top:2px}
+  .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;font-size:11.5px;font-weight:700;letter-spacing:.3px}
+  .pill-gold{background:#fdf6e3;color:#8a6a1a}
+  .pill-green{background:#ecfdf5;color:#047857}
+  .pill-red{background:#fef2f2;color:#b91c1c}
+  .pill-blue{background:#eff6ff;color:#1d4ed8}
+  .pill-purple{background:#f5f3ff;color:#6d28d9}
+  .pill-slate{background:#f1f5f9;color:#334155}
+
+  /* ============ CARDS ============ */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(15,23,42,.04);transition:.2s}
+  .card:hover{box-shadow:0 4px 20px rgba(15,23,42,.07)}
+  .card-title{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+  .card-value{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1.15}
+  .kpi-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+  .kpi-navy{background:#eff6ff;color:var(--navy)}
+  .kpi-gold{background:#fdf6e3;color:var(--gold-3)}
+  .kpi-green{background:#ecfdf5;color:#047857}
+  .kpi-red{background:#fef2f2;color:#b91c1c}
+  .kpi-purple{background:#f5f3ff;color:#6d28d9}
+  .trend{font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;margin-top:8px}
+  .up{background:#ecfdf5;color:#047857}
+  .down{background:#fef2f2;color:#b91c1c}
+
+  /* ============ SCORE RING ============ */
+  .ring-wrap{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+  .ring{position:relative;width:170px;height:170px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .bg{fill:none;stroke:#e2e8f0;stroke-width:12}
+  .ring .fg{fill:none;stroke:url(#goldGrad);stroke-width:12;stroke-linecap:round;stroke-dasharray:471;stroke-dashoffset:471;transition:stroke-dashoffset 1.4s ease}
+  .ring .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .mid b{font-size:40px;font-weight:900;color:var(--navy);letter-spacing:-1.5px;line-height:1}
+  .ring .mid span{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:4px}
+
+  /* ============ TABLES ============ */
+  .tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);margin-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid #f1f5f9;color:#0f172a}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fafbfc}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  th.num{text-align:right}
+
+  /* ============ BUTTONS ============ */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:9px;font-size:13px;font-weight:700;transition:.2s;letter-spacing:.2px}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-primary:hover{background:var(--navy-2)}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-3));color:var(--navy)}
+  .btn-gold:hover{filter:brightness(1.06)}
+  .btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+  .btn-outline:hover{background:var(--navy);color:#fff}
+  .btn-ghost{background:#f1f5f9;color:var(--navy)}
+  .btn-ghost:hover{background:#e2e8f0}
+  .btn-danger{background:#fef2f2;color:#b91c1c}
+  .btn-sm{padding:7px 12px;font-size:12px}
+
+  /* ============ FORMS ============ */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:5px;letter-spacing:.2px}
+  .field input,.field select,.field textarea{
+    width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;
+    font-size:13.5px;background:#fafbfc;outline:none;transition:.2s;font-family:inherit
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 4px rgba(212,168,67,.12)}
+  .field .hint{font-size:11px;color:var(--muted);margin-top:4px}
+
+  /* ============ MODAL ============ */
+  .modal-bg{position:fixed;inset:0;background:rgba(10,22,40,.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:440px;width:100%;padding:30px 28px;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:pop .3s ease}
+  @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal h3{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:4px}
+  .modal .sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+  .lock-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px}
+
+  /* ============ AI PANEL ============ */
+  .ai-box{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #bbf7d0;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+  .ai-box .hd{display:flex;align-items:center;gap:8px;font-weight:800;color:#065f46;margin-bottom:6px;font-size:13px}
+  .ai-box .bd{font-size:13px;color:#0f172a;line-height:1.65}
+  .ai-msg{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:1px solid #c7d2fe}
+  .ai-msg .hd{color:#3730a3}
+
+  /* ============ ROADMAP ============ */
+  .road{display:flex;flex-direction:column;gap:0;padding-left:6px}
+  .road-step{display:flex;gap:12px;align-items:flex-start}
+  .road-dot{width:14px;height:14px;border-radius:50%;border:3px solid var(--gold);background:#fff;flex-shrink:0;margin-top:3px;z-index:2}
+  .road-dot.done{background:var(--gold);border-color:var(--gold-3)}
+  .road-dot.now{background:#fff;border-color:var(--gold);box-shadow:0 0 0 5px rgba(212,168,67,.2);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(212,168,67,.2)}50%{box-shadow:0 0 0 10px rgba(212,168,67,.08)}}
+  .road-line{width:2px;height:30px;background:#e2e8f0;margin-left:6px}
+  .road-line.done{background:var(--gold)}
+  .road-step b{font-size:14px;color:var(--navy)}
+  .road-step small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+
+  /* ============ FOOTER ============ */
+  .footer{margin-top:40px;background:linear-gradient(180deg,var(--navy) 0%,#060f1f 100%);color:rgba(255,255,255,.7);padding:34px 28px 20px;border-top:3px solid var(--gold)}
+  .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:30px;max-width:1300px;margin:0 auto}
+  .footer h4{color:#fff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .footer h4.gold{color:var(--gold)}
+  .footer p,.footer a{font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.62);display:block;transition:.2s}
+  .footer a:hover{color:var(--gold-2);padding-left:3px}
+  .footer-brand{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  .footer-brand .brand-logo{width:40px;height:40px}
+  .footer-brand b{color:#fff;font-size:15px;font-weight:800}
+  .footer-brand small{color:var(--gold);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;display:block}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,.08);margin-top:26px;padding-top:16px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11.5px;color:rgba(255,255,255,.45);max-width:1300px;margin-left:auto;margin-right:auto}
+  .footer-bottom .legal{display:flex;gap:16px;flex-wrap:wrap}
+  .footer-bottom .legal a{font-size:11.5px;display:inline}
+  .footer-warn{margin-top:14px;padding:12px 14px;background:rgba(212,168,67,.08);border-left:3px solid var(--gold);border-radius:8px;font-size:11.5px;line-height:1.7;color:rgba(255,255,255,.7);max-width:1300px;margin-left:auto;margin-right:auto}
+
+  /* ============ MOBILE ============ */
+  .mob-toggle{display:none;position:fixed;top:14px;left:14px;z-index:60;background:var(--navy);color:#fff;border-radius:10px;padding:9px 13px;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:40;backdrop-filter:blur(2px)}
+  .overlay.open{display:block}
+  @media(max-width:1100px){
+    .g4{grid-template-columns:repeat(2,1fr)}
+    .g3{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:900px){
+    .sidebar{transform:translateX(-100%)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0;padding:18px 16px 0}
+    .mob-toggle{display:flex}
+    .topbar{padding-left:52px}
+    .footer-grid{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:640px){
+    .g4,.g3,.g2{grid-template-columns:1fr}
+    .card-value{font-size:22px}
+    .footer-grid{grid-template-columns:1fr;gap:22px}
+  }
+
+  /* tab switching */
+  .tab{display:none}
+  .tab.on{display:block}
+
+  .divider{height:1px;background:#f1f5f9;margin:20px 0}
+  .sec-title{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-3));border-radius:4px;transition:width .8s ease}
+  .stars{color:var(--gold);font-size:15px;letter-spacing:2px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;background:#f1f5f9;font-size:12px;font-weight:600;color:#334155;cursor:pointer;transition:.2s}
+  .chip:hover{background:#e2e8f0}
+  .chip.on{background:var(--navy);color:#fff}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:14px 20px;border-radius:11px;font-size:13px;font-weight:600;box-shadow:0 12px 40px rgba(0,0,0,.3);z-index:300;opacity:0;transform:translateY(20px);transition:.35s;pointer-events:none;border-left:3px solid var(--gold)}
+  .toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ============ MOBILE TOGGLE ============ -->
+<button class="mob-toggle" id="mobToggle">☰</button>
+<div class="overlay" id="overlay"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-logo">MP</div>
+    <div>
+      <h1>MARKOPAŞA</h1>
+      <small>ODAK LIFE 360</small>
+    </div>
+  </div>
+
+  <div class="nav-group">Genel</div>
+  <button class="nav-item active" data-tab="dashboard"><i>📊</i> Dashboard</button>
+  <button class="nav-item" data-tab="experts"><i>🧑‍💼</i> Uzmanlar</button>
+  <button class="nav-item" data-tab="customers"><i>👥</i> Müşteriler</button>
+  <button class="nav-item" data-tab="appointments"><i>📅</i> Randevular</button>
+
+  <div class="nav-group">Finans</div>
+  <button class="nav-item" data-tab="payments"><i>💳</i> Ödemeler</button>
+  <button class="nav-item" data-tab="commissions"><i>💰</i> Komisyonlar</button>
+  <button class="nav-item" data-tab="payouts"><i>🏦</i> Hakedişler</button>
+  <button class="nav-item" data-tab="documents"><i>📄</i> Belge Kontrol</button>
+
+  <div class="nav-group">Operasyon</div>
+  <button class="nav-item" data-tab="crm"><i>📈</i> CRM</button>
+  <button class="nav-item" data-tab="content"><i>📚</i> İçerik / Akademi</button>
+  <button class="nav-item" data-tab="club"><i>🏛️</i> ODAK Kulübü</button>
+  <button class="nav-item" data-tab="ai"><i>🤖</i> AI Asistan</button>
+
+  <div class="nav-group">Sistem</div>
+  <button class="nav-item" data-tab="reports"><i>📑</i> Raporlar</button>
+  <button class="nav-item" data-tab="settings"><i>⚙️</i> Ayarlar</button>
+  <button class="nav-item" data-tab="audit"><i>🔐</i> Audit Log</button>
+
+  <div class="side-user">
+    <div class="avatar">SA</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Süper Admin</div>
+      <div style="font-size:10.5px;color:var(--gold);font-weight:600">● Oturum Açık</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<div class="app">
+<main class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <h2 id="pageTitle">Yönetim Dashboard</h2>
+      <div class="crumb">MarkoPaşa / <span id="crumb">Dashboard</span></div>
+    </div>
+    <div class="top-actions">
+      <span class="pill pill-gold">🔥 Komisyon: %20</span>
+      <span class="pill pill-green">● Sistem Sağlıklı</span>
+      <button class="btn btn-ghost btn-sm" onclick="toast('🔔 3 yeni bildirim')">🔔 Bildirim</button>
+      <button class="btn btn-outline btn-sm" onclick="openLockModal()">🔒 Yeniden Doğrula</button>
+    </div>
+  </div>
+
+  <!-- ============ TAB: DASHBOARD ============ -->
+  <section class="tab on" id="tab-dashboard">
+
+    <!-- SCORE RING -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="170" height="170" viewBox="0 0 170 170">
+            <defs>
+              <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#d4a843"/>
+                <stop offset="100%" stop-color="#b8922f"/>
+              </linearGradient>
+            </defs>
+            <circle class="bg" cx="85" cy="85" r="75"/>
+            <circle class="fg" id="ringFg" cx="85" cy="85" r="75"/>
+          </svg>
+          <div class="mid">
+            <b id="ringNum">0</b>
+            <span>Sistem Skoru</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:280px">
+          <div class="sec-title" style="margin-bottom:6px">🏛️ MarkoPaşa Platform Sağlığı</div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px">
+            Platform bu ay <strong style="color:var(--navy)">₺1.284.500</strong> ciro üretti.
+            <strong style="color:var(--gold-3)">%20 komisyon</strong> modeli ile
+            <strong>₺256.900</strong> platform geliri oluştu.
+          </p>
+          <div class="grid g4" style="gap:10px">
+            <div style="background:#f8fafc;border-radius:9px;padding:10px;text-align:center"><b style="color:var(--navy);font-size:15px">128</b><br><span style="font-size:10px;color:var(--muted)">Uzman</span></div>
+            <div style="background:#f8fafc;border-radius:9px;padding:10px;text-align:center"><b style="color:var(--navy);font-size:15px">2.847</b><br><span style="font-size:10px;color:var(--muted)">Müşteri</span></div>
+            <div style="background:#f8fafc;border-radius:9px;padding:10px;text-align:center"><b style="color:var(--navy);font-size:15px">641</b><br><span style="font-size:10px;color:var(--muted)">Randevu</span></div>
+            <div style="background:#f8fafc;border-radius:9px;padding:10px;text-align:center"><b style="color:var(--navy);font-size:15px">%92</b><br><span style="font-size:10px;color:var(--muted)">Memnuniyet</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="grid g4" style="margin-bottom:18px">
+      <div class="card">
+        <div class="kpi-icon kpi-navy">💳</div>
+        <div class="card-title">Günlük Tahsilat</div>
+        <div class="card-value">₺84.300</div>
+        <span class="trend up">↗ +%12,4</span>
+      </div>
+      <div class="card">
+        <div class="kpi-icon kpi-gold">💰</div>
+        <div class="card-title">Komisyon Geliri (Bu Ay)</div>
+        <div class="card-value">₺256.900</div>
+        <span class="trend up">↗ +%18,2</span>
+      </div>
+      <div class="card">
+        <div class="kpi-icon kpi-green">🏦</div>
+        <div class="card-title">Bekleyen Hakediş</div>
+        <div class="card-value">₺428.700</div>
+        <span class="trend down">⚠ 12 uzman</span>
+      </div>
+      <div class="card">
+        <div class="kpi-icon kpi-red">📄</div>
+        <div class="card-title">Belge Bekleyen</div>
+        <div class="card-value">18</div>
+        <span class="trend down">⚠ İşlem bekliyor</span>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid g2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="sec-title">📈 Aylık Ciro & Komisyon</div>
+        <canvas id="chartCiro" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="sec-title">🧩 Kategori Dağılımı</div>
+        <canvas id="chartCat" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="grid g2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="sec-title">📅 Son Randevular</div>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Müşteri</th><th>Uzman</th><th>Hizmet</th><th class="num">Tutar</th><th>Durum</th></tr>
+            <tr><td>Ahmet Ş.</td><td>Ayşe Yılmaz</td><td>FIRE Ön Görüşme</td><td class="num">₺1.500</td><td><span class="pill pill-green">Tamamlandı</span></td></tr>
+            <tr><td>Zeynep K.</td><td>Mert Demir</td><td>Kariyer Danışmanlığı</td><td class="num">₺900</td><td><span class="pill pill-blue">Onaylandı</span></td></tr>
+            <tr><td>Burak A.</td><td>Selin Çelik</td><td>E-Ticaret Stratejisi</td><td class="num">₺2.200</td><td><span class="pill pill-gold">Bekliyor</span></td></tr>
+            <tr><td>Fatma N.</td><td>Dr. Kerem Öz</td><td>Diyetisyen</td><td class="num">₺750</td><td><span class="pill pill-green">Tamamlandı</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title">🏦 Bekleyen Hakedişler</div>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Uzman</th><th class="num">Brüt</th><th class="num">Komisyon</th><th class="num">Hakediş</th><th>Belge</th></tr>
+            <tr><td>Ayşe Yılmaz</td><td class="num">₺30.000</td><td class="num">₺6.000</td><td class="num">₺24.000</td><td><span class="pill pill-gold">Bekliyor</span></td></tr>
+            <tr><td>Mert Demir</td><td class="num">₺18.500</td><td class="num">₺3.700</td><td class="num">₺14.800</td><td><span class="pill pill-green">Onaylandı</span></td></tr>
+            <tr><td>Selin Çelik</td><td class="num">₺22.800</td><td class="num">₺4.560</td><td class="num">₺18.240</td><td><span class="pill pill-gold">Bekliyor</span></td></tr>
+            <tr><td>Dr. Kerem Öz</td><td class="num">₺12.000</td><td class="num">₺2.400</td><td class="num">₺9.600</td><td><span class="pill pill-blue">Kontrol</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ TAB: EXPERTS =
